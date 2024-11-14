@@ -1,15 +1,15 @@
 ﻿using System.Collections;
 
-namespace SoapServicesCore.Logging;
+namespace AspireSoap.SoapApi.Logging;
 
-public class HttpResponseHeadersLog : IReadOnlyList<KeyValuePair<string, object?>>
+public class HttpRequestHeadersLog : IReadOnlyList<KeyValuePair<string, object?>>
 {
     private readonly List<KeyValuePair<string, object?>> _keyValues;
     private string? _cachedToString;
 
-    internal static readonly Func<object, Exception?, string> Callback = (state, exception) => ((HttpResponseHeadersLog)state).ToString();
+    internal static readonly Func<object, Exception?, string> Callback = (state, exception) => ((HttpRequestHeadersLog)state).ToString();
 
-    public HttpResponseHeadersLog(List<KeyValuePair<string, object?>> keyValues)
+    public HttpRequestHeadersLog(List<KeyValuePair<string, object?>> keyValues)
     {
         _keyValues = keyValues;
     }
@@ -31,10 +31,10 @@ public class HttpResponseHeadersLog : IReadOnlyList<KeyValuePair<string, object?
     {
         if (_cachedToString == null)
         {
-            // Use 2kb as a rough average size for response headers
+            // Use 2kb as a rough average size for request headers
             var builder = new ValueStringBuilder(2 * 1024);
             var count = _keyValues.Count;
-            builder.Append("Response:");
+            builder.Append("Request:");
             builder.Append(Environment.NewLine);
 
             for (var i = 0; i < count - 1; i++)

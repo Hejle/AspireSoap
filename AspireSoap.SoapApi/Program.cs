@@ -1,11 +1,12 @@
-using SoapServicesCore.Behavior;
 using CoreWCF.Configuration;
 using CoreWCF.Description;
-using SoapServicesCore.Logging;
 using CoreWCF.Channels;
 using CoreWCF;
-using SoapServicesCore.ServiceContracts;
-using AspireSoap.Web.Services;
+using AspireSoap.ServiceDefaults;
+using AspireSoap.SoapApi.ServiceContracts;
+using AspireSoap.SoapApi.Logging;
+using AspireSoap.SoapApi.Behavior;
+using AspireSoap.SoapApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 

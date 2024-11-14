@@ -2,7 +2,7 @@
 using CoreWCF.Description;
 using CoreWCF.Dispatcher;
 
-namespace SoapServicesCore.Behavior
+namespace AspireSoap.SoapApi.Behavior
 {
     public class LogMessageBehavior : IEndpointBehavior
     {

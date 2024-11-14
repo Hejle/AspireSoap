@@ -2,7 +2,7 @@
 using CoreWCF.Channels;
 using CoreWCF.Dispatcher;
 
-namespace SoapServicesCore.Behavior
+namespace AspireSoap.SoapApi.Behavior
 {
     public class LogMessageInspector : IDispatchMessageInspector
     {

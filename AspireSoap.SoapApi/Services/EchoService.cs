@@ -1,8 +1,8 @@
-﻿using CoreWCF;
-using SoapServicesCore.ServiceContracts;
+﻿using AspireSoap.SoapApi.ServiceContracts;
+using CoreWCF;
 using System.Security.Principal;
 
-namespace AspireSoap.Web.Services
+namespace AspireSoap.SoapApi.Services
 {
     public class EchoService : IEchoService
     {

@@ -1,4 +1,4 @@
-﻿namespace AspireSoap.Web.Services;
+﻿namespace AspireSoap.SoapApi.Services;
 
 public record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary);
 

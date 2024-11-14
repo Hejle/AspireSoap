@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
 
-namespace SoapServicesCore.ServiceContracts;
+namespace AspireSoap.SoapApi.ServiceContracts;
 
 [DataContract]
 public class EchoFault

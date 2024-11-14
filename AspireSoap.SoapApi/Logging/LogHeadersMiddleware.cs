@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace SoapServicesCore.Logging;
+namespace AspireSoap.SoapApi.Logging;
 
 public class LogHeadersMiddleware
 {

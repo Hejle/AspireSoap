@@ -1,4 +1,4 @@
-﻿namespace SoapServicesCore.ServiceContracts
+﻿namespace AspireSoap.SoapApi.ServiceContracts
 {
     public class PingOutput
     {

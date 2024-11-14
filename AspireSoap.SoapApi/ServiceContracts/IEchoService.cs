@@ -1,6 +1,6 @@
 ﻿using CoreWCF;
 
-namespace SoapServicesCore.ServiceContracts;
+namespace AspireSoap.SoapApi.ServiceContracts;
 
 [ServiceContract(Name = "IEchoService")]
 public interface IEchoService

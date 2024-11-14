@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
-namespace SoapServicesCore.Logging;
+namespace AspireSoap.SoapApi.Logging;
 
 //Copied and trimmed from:
 //https://github.com/dotnet/runtime/blob/a9c5eadd951dcba73167f72cc624eb790573663a/src/libraries/Common/src/System/Text/ValueStringBuilder.cs

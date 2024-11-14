@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35506.116 d17.12
+VisualStudioVersion = 17.12.35506.116
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspireSoap.AppHost", "AspireSoap.AppHost\AspireSoap.AppHost.csproj", "{40F650F3-B451-4332-8248-3E9224649008}"
 EndProject
@@ -8,9 +8,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspireSoap.ServiceDefaults"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspireSoap.ApiService", "AspireSoap.ApiService\AspireSoap.ApiService.csproj", "{546AFA9C-1536-4C71-AE89-92EA66F4447D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspireSoap.Web", "AspireSoap.Web\AspireSoap.Web.csproj", "{19CA5DC0-49ED-4DAD-A84F-3455C5D83751}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspireSoap.Tests", "AspireSoap.Tests\AspireSoap.Tests.csproj", "{8B8B979D-CBD6-4A89-9889-DC741DDEDDAD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{FD8DFDD7-A988-438B-8EEA-DB131236D48D}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		Directory.Build.props = Directory.Build.props
+		nuget.config = nuget.config
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspireSoap.SoapApi", "AspireSoap.SoapApi\AspireSoap.SoapApi.csproj", "{F3911B4B-FE26-4D55-8FFB-6C200C88EEF0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -30,14 +37,14 @@ Global
 		{546AFA9C-1536-4C71-AE89-92EA66F4447D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{546AFA9C-1536-4C71-AE89-92EA66F4447D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{546AFA9C-1536-4C71-AE89-92EA66F4447D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{19CA5DC0-49ED-4DAD-A84F-3455C5D83751}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{19CA5DC0-49ED-4DAD-A84F-3455C5D83751}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{19CA5DC0-49ED-4DAD-A84F-3455C5D83751}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{19CA5DC0-49ED-4DAD-A84F-3455C5D83751}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8B8B979D-CBD6-4A89-9889-DC741DDEDDAD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8B8B979D-CBD6-4A89-9889-DC741DDEDDAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8B8B979D-CBD6-4A89-9889-DC741DDEDDAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8B8B979D-CBD6-4A89-9889-DC741DDEDDAD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F3911B4B-FE26-4D55-8FFB-6C200C88EEF0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3911B4B-FE26-4D55-8FFB-6C200C88EEF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3911B4B-FE26-4D55-8FFB-6C200C88EEF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F3911B4B-FE26-4D55-8FFB-6C200C88EEF0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
