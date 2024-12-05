@@ -4,9 +4,15 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.ServiceDiscovery;
 using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
+using Serilog;
+using Serilog.Enrichers.Span;
+using Serilog.Exceptions;
+using Serilog.Exceptions.Core;
+using Serilog.Sinks.OpenTelemetry;
 
 namespace AspireSoap.ServiceDefaults;
 
@@ -32,36 +38,100 @@ public static class Extensions
             http.AddServiceDiscovery();
         });
 
-        // Uncomment the following to restrict the allowed schemes for service discovery.
-        // builder.Services.Configure<ServiceDiscoveryOptions>(options =>
-        // {
-        //     options.AllowedSchemes = ["https"];
-        // });
+        builder.Services.Configure<ServiceDiscoveryOptions>(options =>
+        {
+            options.AllowedSchemes = ["https"];
+        });
 
         return builder;
     }
 
-    public static TBuilder ConfigureOpenTelemetry<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
+    public static IHostApplicationBuilder ConfigureSerilog(this IHostApplicationBuilder builder)
     {
-        builder.Logging.AddOpenTelemetry(logging =>
+        ArgumentNullException.ThrowIfNull(builder);
+
+        builder.Services.AddSerilog(config =>
         {
-            logging.IncludeFormattedMessage = true;
-            logging.IncludeScopes = true;
+            config.ReadFrom.Configuration(builder.Configuration)
+                  .Enrich.FromLogContext()
+                  .Enrich.WithMachineName()
+                  .Enrich.WithProcessId()
+                  .Enrich.WithProcessName()
+                  .Enrich.WithThreadId()
+                  .Enrich.WithSpan()
+                  .Enrich.WithExceptionDetails(new DestructuringOptionsBuilder()
+                                               .WithDefaultDestructurers())
+                  .Enrich.WithProperty("Environment", builder.Environment.EnvironmentName)
+                  .WriteTo.Console()
+                  .WriteTo.OpenTelemetry(options =>
+                  {
+                      options.IncludedData = IncludedData.TraceIdField | IncludedData.SpanIdField;
+                      options.Endpoint = builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"];
+                      AddHeaders(options.Headers, builder.Configuration["OTEL_EXPORTER_OTLP_HEADERS"]);
+                      AddResourceAttributes(options.ResourceAttributes, builder.Configuration["OTEL_RESOURCE_ATTRIBUTES"]);
+
+                      void AddHeaders(IDictionary<string, string> headers, string headerConfig)
+                      {
+                          if (!string.IsNullOrEmpty(headerConfig))
+                          {
+                              foreach (var header in headerConfig.Split(','))
+                              {
+                                  var parts = header.Split('=');
+
+                                  if (parts.Length == 2)
+                                  {
+                                      headers[parts[0]] = parts[1];
+                                  }
+                                  else
+                                  {
+                                      throw new InvalidOperationException($"Invalid header format: {header}");
+                                  }
+                              }
+                          }
+                      }
+
+                      void AddResourceAttributes(IDictionary<string, object> attributes, string attributeConfig)
+                      {
+                          if (!string.IsNullOrEmpty(attributeConfig))
+                          {
+                              var parts = attributeConfig.Split('=');
+
+                              if (parts.Length == 2)
+                              {
+                                  attributes[parts[0]] = parts[1];
+                              }
+                              else
+                              {
+                                  throw new InvalidOperationException($"Invalid resource attribute format: {attributeConfig}");
+                              }
+                          }
+                      }
+                  });
         });
 
+        return builder;
+    }
+
+    public static IHostApplicationBuilder ConfigureOpenTelemetry(this IHostApplicationBuilder builder)
+    {
+        builder.Logging.ClearProviders();
+        builder.ConfigureSerilog();
         builder.Services.AddOpenTelemetry()
-            .WithMetrics(metrics =>
-            {
-                metrics.AddAspNetCoreInstrumentation()
-                    .AddHttpClientInstrumentation()
-                    .AddRuntimeInstrumentation();
-            })
-            .WithTracing(tracing =>
-            {
+           .WithMetrics(metrics =>
+           {
+               metrics.AddAspNetCoreInstrumentation()
+                      .AddHttpClientInstrumentation()
+                      .AddRuntimeInstrumentation();
+           })
+           .WithTracing(tracing =>
+           {
                 tracing.AddSource(builder.Environment.ApplicationName)
-                    .AddAspNetCoreInstrumentation()
-                    .AddHttpClientInstrumentation();
-            });
+                .AddAspNetCoreInstrumentation()
+                .AddHttpClientInstrumentation(options => options.FilterHttpRequestMessage = request =>
+                {
+                    return !request.RequestUri?.AbsoluteUri.Contains(builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"], StringComparison.Ordinal) ?? true;
+                });
+           });
 
         builder.AddOpenTelemetryExporters();
 

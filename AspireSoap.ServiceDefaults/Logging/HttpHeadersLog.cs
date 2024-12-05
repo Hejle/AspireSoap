@@ -2,11 +2,11 @@
 
 namespace AspireSoap.ServiceDefaults.Logging;
 
-public class HttpResponseHeadersLog : Dictionary<string, string>
+public class HttpHeadersLog : Dictionary<string, string>
 {
     private static JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions { WriteIndented = true };
 
-    public HttpResponseHeadersLog(List<KeyValuePair<string, object?>> keyValues)
+    public HttpHeadersLog(List<KeyValuePair<string, object?>> keyValues)
     {
         foreach (var kvp in keyValues)
         {

@@ -18,9 +18,14 @@ public class AuditLogMiddleware : IMiddleware
     {
         var requestHeaders = ReadRequestHeaders(context);
         var requestBody = await ReadBodyFromRequest(context.Request);
-
-        _logger.LogInformation("Recieved request: {requestmethod} | {requestpath} | {@requestheaders} | {@requestbody}",
-            context.Request.Method, context.Request.Path, requestHeaders, requestBody);
+        using (var scope = _logger.BeginScope(new Dictionary<string, object?>
+        {
+            { "RequestHeaders", requestHeaders.ToJson() },
+            { "RequestBody", requestBody },
+        }))
+        {
+            _logger.LogInformation("Received incoming {RequestMethod} request on {RequestPath}.", context.Request.Method, context.Request.Path);
+        }
 
         Stream originalBody = context.Response.Body;
         var newBody = new MemoryStream();
@@ -39,8 +44,14 @@ public class AuditLogMiddleware : IMiddleware
         {
             responseBody ??= await ReadResponseBodyAndAssignResponseToResponseStream(originalBody, newBody);
             var responseHeaders = ReadResponseHeaders(context);
-            _logger.LogInformation("Responded with: {responsecode} | {@responseheader} | {@responsebody}",
-                context.Response.StatusCode, responseHeaders.ToJson(), responseBody);
+            using (var scope = _logger.BeginScope(new Dictionary<string, object?>
+            {
+                { "ResponseHeaders", responseHeaders.ToJson() },
+                { "ResponseBody", responseBody },
+            }))
+            {
+                _logger.LogInformation("Responded with: {ResponseCode} {RequestPath}.", context.Response.StatusCode, context.Request.Path);
+            }
         }
     }
 
@@ -53,24 +64,28 @@ public class AuditLogMiddleware : IMiddleware
         return responseBody;
     }
 
-    private static HttpResponseHeadersLog ReadResponseHeaders(HttpContext context)
+    private static HttpHeadersLog ReadResponseHeaders(HttpContext context)
     {
         var uniqueResponseHeaders = context.Response.Headers
                     .ToList()
                     .ConvertAll(x => new KeyValuePair<string, object?>(x.Key, x.Value));
-        return new HttpResponseHeadersLog(uniqueResponseHeaders);
+        return new HttpHeadersLog(uniqueResponseHeaders);
     }
 
-    private static HttpRequestHeadersLog ReadRequestHeaders(HttpContext context)
+    private static HttpHeadersLog ReadRequestHeaders(HttpContext context)
     {
         var uniqueRequestHeaders = context.Request.Headers
                     .ToList()
                     .ConvertAll(x => new KeyValuePair<string, object?>(x.Key, x.Value));
-        return new HttpRequestHeadersLog(uniqueRequestHeaders);
+        return new HttpHeadersLog(uniqueRequestHeaders);
     }
 
-    private static async Task<string> ReadBodyFromRequest(HttpRequest request)
+    private static async Task<string?> ReadBodyFromRequest(HttpRequest request)
     {
+        if(request.ContentLength == 0)
+        {
+            return string.Empty;
+        }
         // Ensure the request's body can be read multiple times (for the next middlewares in the pipeline).
         request.EnableBuffering();
 

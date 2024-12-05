@@ -28,7 +28,6 @@ var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 app.UseExceptionHandler();
-app.UseMiddleware<AuditLogMiddleware>();
 if (!builder.Environment.IsDevelopment())
 {
     app.UseAuthentication();
@@ -40,6 +39,7 @@ app.MapScalarApiReference();
 
 string[] summaries = ["Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"];
 
+app.UseMiddleware<AuditLogMiddleware>();
 app.MapGet("/weatherforecast", () =>
 {
     var forecast = Enumerable.Range(1, 5).Select(index =>
