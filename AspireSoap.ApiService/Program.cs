@@ -21,10 +21,12 @@ builder.Services.AddProblemDetails();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
-
+builder.Services.AddCors();
 builder.Services.AddSingleton<AuditLogMiddleware>();
 
 var app = builder.Build();
+
+app.UseCors(x => x.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
 
 // Configure the HTTP request pipeline.
 app.UseExceptionHandler();
@@ -53,6 +55,33 @@ app.MapGet("/weatherforecast", () =>
     return forecast;
 })
 .WithName("GetWeatherForecast");
+
+
+app.MapGet("/weatherforecastsingle", () =>
+{
+    var forecast = new WeatherForecast
+    (
+        DateOnly.FromDateTime(DateTime.Now.AddDays(1)),
+        Random.Shared.Next(-20, 55),
+        summaries[Random.Shared.Next(summaries.Length)]
+    );
+    return forecast;
+})
+.WithName("GetAWeatherForecast");
+
+app.MapGet("/weatherforecastmany", () =>
+{
+    var forecast = Enumerable.Range(1, 10).Select(index =>
+    new WeatherForecast
+    (
+        DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
+        Random.Shared.Next(-20, 55),
+        summaries[Random.Shared.Next(summaries.Length)]
+    ))
+    .ToArray();
+    return forecast;
+})
+.WithName("GetManyWeatherForecast");
 
 app.MapDefaultEndpoints();
 

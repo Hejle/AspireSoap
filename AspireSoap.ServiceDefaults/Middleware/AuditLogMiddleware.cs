@@ -30,19 +30,18 @@ public class AuditLogMiddleware : IMiddleware
         Stream originalBody = context.Response.Body;
         var newBody = new MemoryStream();
         context.Response.Body = newBody;
-        string? responseBody = null;
         try
         {
             await next(context);
         }
-        catch (Exception)
+        catch (Exception e)
         {
-            responseBody = await ReadResponseBodyAndAssignResponseToResponseStream(originalBody, newBody);
+            _logger.LogError(e, "An error occurred while processing the request.");
             throw;
         }
         finally
         {
-            responseBody ??= await ReadResponseBodyAndAssignResponseToResponseStream(originalBody, newBody);
+            var responseBody = await ReadResponseBodyAndAssignResponseToResponseStream(originalBody, newBody);
             var responseHeaders = ReadResponseHeaders(context);
             using (var scope = _logger.BeginScope(new Dictionary<string, object?>
             {
@@ -57,6 +56,10 @@ public class AuditLogMiddleware : IMiddleware
 
     private static async Task<string> ReadResponseBodyAndAssignResponseToResponseStream(Stream originalBody, MemoryStream newBody)
     {
+        if(newBody.Length == 0)
+        {
+            return string.Empty;
+        }
         var buff = newBody.ToArray();
         var responseBody = Encoding.UTF8.GetString(buff, 0, buff.Length);
         //Write repsonse to the Original Stream
@@ -82,7 +85,7 @@ public class AuditLogMiddleware : IMiddleware
 
     private static async Task<string?> ReadBodyFromRequest(HttpRequest request)
     {
-        if(request.ContentLength == 0)
+        if(request.ContentLength == 0 || request.ContentLength is null)
         {
             return string.Empty;
         }

@@ -13,6 +13,7 @@ using Serilog.Enrichers.Span;
 using Serilog.Exceptions;
 using Serilog.Exceptions.Core;
 using Serilog.Sinks.OpenTelemetry;
+using Serilog.Sinks.SystemConsole.Themes;
 
 namespace AspireSoap.ServiceDefaults;
 
@@ -62,9 +63,11 @@ public static class Extensions
                   .Enrich.WithExceptionDetails(new DestructuringOptionsBuilder()
                                                .WithDefaultDestructurers())
                   .Enrich.WithProperty("Environment", builder.Environment.EnvironmentName)
-                  .WriteTo.Console()
+                  //.MinimumLevel.Verbose()
+                  .WriteTo.Console(theme: AnsiConsoleTheme.Code)
                   .WriteTo.OpenTelemetry(options =>
                   {
+                      options.Protocol = OtlpProtocol.Grpc;
                       options.IncludedData = IncludedData.TraceIdField | IncludedData.SpanIdField;
                       options.Endpoint = builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"];
                       AddHeaders(options.Headers, builder.Configuration["OTEL_EXPORTER_OTLP_HEADERS"]);
@@ -94,15 +97,20 @@ public static class Extensions
                       {
                           if (!string.IsNullOrEmpty(attributeConfig))
                           {
-                              var parts = attributeConfig.Split('=');
+                              var attributesConfigParts = attributeConfig.Split(',');
 
-                              if (parts.Length == 2)
+                              foreach (var attributesConfigPart in attributesConfigParts)
                               {
-                                  attributes[parts[0]] = parts[1];
-                              }
-                              else
-                              {
-                                  throw new InvalidOperationException($"Invalid resource attribute format: {attributeConfig}");
+                                  var parts = attributesConfigPart.Split('=');
+
+                                  if (parts.Length == 2)
+                                  {
+                                      attributes[parts[0]] = parts[1];
+                                  }
+                                  else
+                                  {
+                                      throw new InvalidOperationException($"Invalid resource attribute format: {attributeConfig}");
+                                  }
                               }
                           }
                       }
@@ -116,6 +124,7 @@ public static class Extensions
     {
         builder.Logging.ClearProviders();
         builder.ConfigureSerilog();
+
         builder.Services.AddOpenTelemetry()
            .WithMetrics(metrics =>
            {
@@ -125,16 +134,13 @@ public static class Extensions
            })
            .WithTracing(tracing =>
            {
-                tracing.AddSource(builder.Environment.ApplicationName)
-                .AddAspNetCoreInstrumentation()
-                .AddHttpClientInstrumentation(options => options.FilterHttpRequestMessage = request =>
-                {
-                    return !request.RequestUri?.AbsoluteUri.Contains(builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"], StringComparison.Ordinal) ?? true;
-                });
-           });
-
+               tracing.AddSource(builder.Environment.ApplicationName)
+               .AddSource("Serilog")
+               .AddAspNetCoreInstrumentation()
+               .AddHttpClientInstrumentation();
+           })
+           ;
         builder.AddOpenTelemetryExporters();
-
         return builder;
     }
 
