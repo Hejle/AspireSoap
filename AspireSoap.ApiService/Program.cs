@@ -1,8 +1,5 @@
 using AspireSoap.ServiceDefaults;
 using AspireSoap.ServiceDefaults.Middleware;
-using Google.Protobuf.WellKnownTypes;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Identity.Web;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,9 +9,9 @@ builder.AddServiceDefaults();
 
 if (!builder.Environment.IsDevelopment())
 {
-    builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-        .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
-    builder.Services.AddAuthorization();
+    //builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    //    .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
+    //builder.Services.AddAuthorization();
 }
 // Add services to the container.
 builder.Services.AddProblemDetails();
@@ -26,14 +23,18 @@ builder.Services.AddSingleton<AuditLogMiddleware>();
 
 var app = builder.Build();
 
-app.UseCors(x => x.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
+app.UseCors(x => 
+    x.AllowAnyOrigin()
+    .AllowAnyHeader()
+    .AllowAnyMethod()
+    );
 
 // Configure the HTTP request pipeline.
 app.UseExceptionHandler();
 if (!builder.Environment.IsDevelopment())
 {
-    app.UseAuthentication();
-    app.UseAuthorization();
+    //app.UseAuthentication();
+    //app.UseAuthorization();
 }
 
 app.MapOpenApi();

@@ -9,7 +9,6 @@ using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 using Serilog;
-using Serilog.Enrichers.Span;
 using Serilog.Exceptions;
 using Serilog.Exceptions.Core;
 using Serilog.Sinks.OpenTelemetry;
@@ -55,15 +54,9 @@ public static class Extensions
         {
             config.ReadFrom.Configuration(builder.Configuration)
                   .Enrich.FromLogContext()
-                  .Enrich.WithMachineName()
-                  .Enrich.WithProcessId()
-                  .Enrich.WithProcessName()
-                  .Enrich.WithThreadId()
-                  .Enrich.WithSpan()
                   .Enrich.WithExceptionDetails(new DestructuringOptionsBuilder()
                                                .WithDefaultDestructurers())
                   .Enrich.WithProperty("Environment", builder.Environment.EnvironmentName)
-                  //.MinimumLevel.Verbose()
                   .WriteTo.Console(theme: AnsiConsoleTheme.Code)
                   .WriteTo.OpenTelemetry(options =>
                   {
@@ -73,7 +66,7 @@ public static class Extensions
                       AddHeaders(options.Headers, builder.Configuration["OTEL_EXPORTER_OTLP_HEADERS"]);
                       AddResourceAttributes(options.ResourceAttributes, builder.Configuration["OTEL_RESOURCE_ATTRIBUTES"]);
 
-                      void AddHeaders(IDictionary<string, string> headers, string headerConfig)
+                      void AddHeaders(IDictionary<string, string> headers, string? headerConfig)
                       {
                           if (!string.IsNullOrEmpty(headerConfig))
                           {
@@ -93,7 +86,7 @@ public static class Extensions
                           }
                       }
 
-                      void AddResourceAttributes(IDictionary<string, object> attributes, string attributeConfig)
+                      void AddResourceAttributes(IDictionary<string, object> attributes, string? attributeConfig)
                       {
                           if (!string.IsNullOrEmpty(attributeConfig))
                           {
