@@ -1,0 +1,16 @@
+<Solution>
+  <Folder Name="/Services/" Id="02ea681e-c7d8-13c7-8484-4ac65e1b71e8">
+    <Project Path="AspireSoap.ApiService/AspireSoap.ApiService.csproj" />
+    <Project Path="AspireSoap.SoapApi/AspireSoap.SoapApi.csproj" />
+  </Folder>
+  <Folder Name="/Shared/">
+    <Project Path="AspireSoap.ServiceDefaults/AspireSoap.ServiceDefaults.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path="Directory.Build.props" />
+    <File Path="nuget.config" />
+  </Folder>
+  <Project Path="AspireSoap.AppHost/AspireSoap.AppHost.csproj" />
+  <Project Path="AspireSoap.Tests/AspireSoap.Tests.csproj" />
+</Solution>
